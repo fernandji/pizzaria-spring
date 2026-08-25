@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,10 @@ public class PizzaService {
 
     public List<PizzaEntity> findAll() {
         return pizzaRepository.findAll();
+    }
+
+    public Optional<PizzaEntity> getPizzaById(Long id){
+        return pizzaRepository.findById(id);
     }
 
     public void addPizza(PizzaDto pizzaDto) {
