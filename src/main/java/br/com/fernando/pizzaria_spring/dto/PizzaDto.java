@@ -17,5 +17,5 @@ public class PizzaDto {
     @NotNull
     private BigDecimal preco;
     @NotNull
-    private int quantidade;
+    private Integer quantidade;
 }
