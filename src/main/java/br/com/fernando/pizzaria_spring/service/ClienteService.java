@@ -21,7 +21,7 @@ public class ClienteService {
         clienteRepository.save(ClienteEntity.builder()
                 .nome(clienteDto.getNome())
                 .telefone(clienteDto.getTelefone())
-                .endereco(clienteDto.getTelefone())
+                .endereco(clienteDto.getEndereco())
                 .build());
     }
 }
