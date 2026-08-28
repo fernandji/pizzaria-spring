@@ -15,6 +15,7 @@ import java.util.List;
 public class PedidoResponseDto {
 
     private Long id;
+    private String nomeCliente;
     private String endereco;
     private BigDecimal valorTotal;
     private LocalDateTime dataHora;

@@ -7,9 +7,7 @@ import br.com.fernando.pizzaria_spring.database.model.PizzaEntity;
 import br.com.fernando.pizzaria_spring.database.repository.IClienteRepository;
 import br.com.fernando.pizzaria_spring.database.repository.IPedidoRepository;
 import br.com.fernando.pizzaria_spring.database.repository.IPizzaRepository;
-import br.com.fernando.pizzaria_spring.dto.ClienteDto;
-import br.com.fernando.pizzaria_spring.dto.ItemPedidoRequestDto;
-import br.com.fernando.pizzaria_spring.dto.PedidoRequestDto;
+import br.com.fernando.pizzaria_spring.dto.*;
 import br.com.fernando.pizzaria_spring.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,12 +25,41 @@ public class PedidoService {
     private final IPedidoRepository pedidoRepository;
     private final IPizzaRepository pizzaRepository;
 
-    public List<PedidoEntity> findAllPedidos(){
-        return pedidoRepository.findAll();
+    public List<PedidoResponseDto> findAllPedidos() {
+        List<PedidoEntity> pedidoEntities = pedidoRepository.findAll();
+        List<PedidoResponseDto> pedidoResponseDtos = new ArrayList<>();
+
+        for(PedidoEntity pedidoEntity : pedidoEntities){
+            PedidoResponseDto pedidoResponse = converterParaDto(pedidoEntity);
+            pedidoResponseDtos.add(pedidoResponse);
+        }
+        return pedidoResponseDtos;
+    }
+
+
+    public PedidoResponseDto converterParaDto(PedidoEntity pedidoEntity) {
+
+        List<ItemPedidoResponseDto> itensDto = pedidoEntity.getItens().stream()
+                .map(item -> ItemPedidoResponseDto.builder()
+                        .nomePizza(item.getPizzaEntity().getNome())
+                        .quantidade(item.getQuantidade())
+                        .valorUnitario(item.getPrecoUnitario())
+                        .subtotal(item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade())))
+                        .build())
+                .toList();
+
+        return PedidoResponseDto.builder()
+                .id(pedidoEntity.getId())
+                .nomeCliente(pedidoEntity.getClienteEntity().getNome())
+                .endereco(pedidoEntity.getEndereco())
+                .dataHora(pedidoEntity.getDataHora())
+                .valorTotal(pedidoEntity.getValorTotal())
+                .itens(itensDto)
+                .build();
     }
 
     @Transactional
-    public void realizarPedido(PedidoRequestDto pedidoRequestDto) {
+    public PedidoResponseDto realizarPedido(PedidoRequestDto pedidoRequestDto) {
         ClienteEntity clienteEntity = clienteRepository.findClienteEntityById(pedidoRequestDto.getClienteId())
                 .orElseThrow(() -> new NotFoundException("Cliente não encontrado!"));
 
@@ -53,7 +80,7 @@ public class PedidoService {
             pizzaEntity.setQuantidade(pizzaEntity.getQuantidade() - item.getQuantidade());
 
             BigDecimal subtotalItem = pizzaEntity.getPreco().multiply(BigDecimal.valueOf(item.getQuantidade()));
-            valorTotalAcumulado.add(subtotalItem);
+            valorTotalAcumulado = valorTotalAcumulado.add(subtotalItem);
 
             ItemPedidoEntity itemPedidoEntity = ItemPedidoEntity.builder()
                     .pizzaEntity(pizzaEntity)
@@ -69,5 +96,6 @@ public class PedidoService {
 
         pedidoRepository.save(pedidoEntity);
 
+        return converterParaDto(pedidoEntity);
     }
 }
