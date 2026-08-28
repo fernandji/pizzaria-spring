@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,14 @@ public class PedidoService {
     private final IClienteRepository clienteRepository;
     private final IPedidoRepository pedidoRepository;
     private final IPizzaRepository pizzaRepository;
+
+    public Optional<PedidoResponseDto> findPedidoById(Long idPedido){
+        PedidoEntity pedidoEntity = pedidoRepository.findPedidoEntityById(idPedido)
+                .orElseThrow(() -> new NotFoundException("Pedido não encontrado!"));
+
+        PedidoResponseDto pedidoResponseDto = converterParaDto(pedidoEntity);
+        return Optional.of(pedidoResponseDto);
+    }
 
     public List<PedidoResponseDto> findAllPedidos() {
         List<PedidoEntity> pedidoEntities = pedidoRepository.findAll();
