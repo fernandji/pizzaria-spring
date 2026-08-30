@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -24,6 +25,12 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.OK)
     public List<ClienteEntity> findAll(){
         return clienteService.findAll();
+    }
+
+    @GetMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Optional<ClienteDto> findById(@PathVariable Long id){
+        return clienteService.findById(id);
     }
 
     @PostMapping
