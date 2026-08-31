@@ -18,7 +18,7 @@ public class ClienteService {
 
     public Optional<ClienteDto> findById(Long idCliente){
         ClienteEntity clienteEntity = clienteRepository.findClienteEntityById(idCliente)
-                .orElseThrow(() -> new NotFoundException("Cliente" + idCliente + " não encontrado!"));
+                .orElseThrow(() -> new NotFoundException("Cliente " + idCliente + " não encontrado!"));
 
         ClienteDto clienteDto = ClienteDto.builder()
                 .nome(clienteEntity.getNome())
